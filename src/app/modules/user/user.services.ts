@@ -64,13 +64,7 @@ const createUserIntoDB = async (userData: IUser) => {
 
 const getUsersIntoDB = async () => {
   try {
-    const users = await prisma.user.findMany({
-      where: {
-        userStatus: {
-          not: "DELETED" || "BLOCKED",
-        },
-      },
-    });
+    const users = await prisma.user.findMany();
     if (users.length === 0) {
       throw new ApiError(404, "Users not found!");
     }
@@ -89,10 +83,7 @@ const getSingleUserIntoDB = async (id: string) => {
     }
     const user = await prisma.user.findUnique({
       where: {
-        id,
-        userStatus: {
-          not: "DELETED" || "BLOCKED",
-        },
+        id: id,
       },
     });
     if (!user) {

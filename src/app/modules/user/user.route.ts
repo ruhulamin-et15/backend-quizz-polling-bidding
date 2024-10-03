@@ -1,7 +1,5 @@
 import express from "express";
 import { UserControllers } from "./user.controller";
-import isLoggedIn from "../../middlewares/isLoggedin";
-import isAdmin from "../../middlewares/isAdmin";
 import auth from "../../middlewares/auth";
 
 const router = express.Router();
