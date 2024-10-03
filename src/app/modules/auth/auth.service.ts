@@ -1,16 +1,13 @@
 import { transporter } from "./../../../helpers/transporter";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
 import ApiError from "../../errors/ApiErrors";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import config from "../../../config";
 import { authReusable } from "./auth.reusable";
-import twilio from "twilio";
 import { IVerifyData } from "./auth.interface";
-import sendResponse from "../../../shared/sendResponse";
+import prisma from "../../../shared/prisma";
 
-const prisma = new PrismaClient();
-const client = twilio(config.otp.account_ssid, config.otp.auth_token);
+// const client = twilio(config.otp.account_ssid, config.otp.auth_token);
 
 interface TuserData {
   email: string;
@@ -49,7 +46,6 @@ const loginUserIntoDB = async (userData: TuserData) => {
     );
 
     return {
-      user,
       token,
     };
   } catch (error) {
@@ -118,7 +114,8 @@ const forgetPasswordIntoDB = async (email: string) => {
     subject: "Password Reset Request",
     html: `
       <p>Hello,</p>
-      <p>Verify using this OTP: ${otp} or,</p>
+      <p>Verify using this OTP: ${otp}, This OTP is Expired in 5 minutes,</p>
+      <p>Or</p>
       <p>You requested a password reset. Please click the link below to reset your password:</p>
       <a href="http://localhost:3000/reset-password?token=${resetToken}">Reset Password</a>
       <p>If you didn't request this, please ignore this email.</p>
@@ -169,30 +166,43 @@ const forgetPasswordIntoDB = async (email: string) => {
 //   return otp;
 // };
 
-//verify otp get from email
-const verifyOtpFromEmailIntoDB = async (verifyData: IVerifyData) => {
-  const user = await prisma.user.findUnique({
-    where: { email: verifyData.email },
+//verify otp and reset password
+const resetPasswordUsingOTPVerify = async (verifyData: IVerifyData) => {
+  const { email, otp, newPassword } = verifyData;
+
+  const user = await prisma.user.findFirst({
+    where: {
+      email: email,
+    },
   });
 
   if (!user) {
-    throw new ApiError(404, "Please inter your currect email address");
+    throw new ApiError(404, "User not found for change password!");
   }
 
-  const currentTime = Date.now();
-  const presentTime = new Date(currentTime);
+  const currentTime = new Date(Date.now());
 
-  if (user?.otp !== verifyData.otp) {
+  if (user?.otp !== otp) {
     throw new ApiError(404, "Your OTP is incorrect!");
-  } else if (!user.otpExpiresAt || user.otpExpiresAt <= presentTime) {
+  } else if (!user.otpExpiresAt || user.otpExpiresAt <= currentTime) {
     throw new ApiError(409, "Your OTP is expired, please send new otp");
   }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashedPassword,
+      otp: null,
+      otpExpiresAt: null,
+    },
+  });
 
   return user;
 };
 
-//reset password
-const resetPasswordIntoDB = async (userData: {
+//reset password using token
+const resetPasswordUsingTokenVerify = async (userData: {
   email: string;
   newPassword: string;
 }) => {
@@ -208,6 +218,6 @@ export const authService = {
   loginUserIntoDB,
   changePasswordIntoDB,
   forgetPasswordIntoDB,
-  resetPasswordIntoDB,
-  verifyOtpFromEmailIntoDB,
+  resetPasswordUsingOTPVerify,
+  resetPasswordUsingTokenVerify,
 };

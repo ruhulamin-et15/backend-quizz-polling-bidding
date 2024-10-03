@@ -1,14 +1,13 @@
 import express from "express";
 import { authController } from "./auth.controller";
-import isLoggedIn from "../../middlewares/isLoggedin";
+import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
 router.post("/login", authController.loginUser);
-router.patch("/change-password", isLoggedIn, authController.changePassword);
+router.patch("/change-password", auth(), authController.changePassword);
 router.post("/forget-password", authController.forgetPassword);
-router.post("/verify-otp-email", authController.verifyOtpFromEmail);
-
-router.patch("/reset-password", authController.resetPassword);
+router.patch("/reset-password-otp", authController.resetPasswordUsingOTP);
+router.patch("/reset-password-token", authController.resetPasswordUsingToken);
 
 export const authRoutes = router;
