@@ -49,7 +49,7 @@ const updatedUser = catchAsync(async (req, res) => {
   });
 });
 
-//delete user, not delete from database
+//user soft delete
 const deletedUser = catchAsync(async (req, res) => {
   await userService.deleteUserIntoDB(req.params.id);
   sendResponse(res, {
@@ -59,7 +59,7 @@ const deletedUser = catchAsync(async (req, res) => {
   });
 });
 
-//delete user from database
+//user hard delete
 const deletedUserFromDatabase = catchAsync(async (req, res) => {
   await userService.deleteUserFromDB(req.params.id);
   sendResponse(res, {

@@ -6,6 +6,7 @@ import { ObjectId } from "mongodb";
 
 const prisma = new PrismaClient();
 
+//create user
 const createUserIntoDB = async (userData: IUser) => {
   try {
     const {
@@ -62,6 +63,7 @@ const createUserIntoDB = async (userData: IUser) => {
   }
 };
 
+//get all users
 const getUsersIntoDB = async () => {
   try {
     const users = await prisma.user.findMany();
@@ -76,6 +78,7 @@ const getUsersIntoDB = async () => {
   }
 };
 
+//get single user
 const getSingleUserIntoDB = async (id: string) => {
   try {
     if (!ObjectId.isValid(id)) {
@@ -96,6 +99,7 @@ const getSingleUserIntoDB = async (id: string) => {
   }
 };
 
+//update user
 const updateUserIntoDB = async (id: string, userData: IUser) => {
   try {
     if (!ObjectId.isValid(id)) {
@@ -121,6 +125,7 @@ const updateUserIntoDB = async (id: string, userData: IUser) => {
   }
 };
 
+//user soft delete
 const deleteUserIntoDB = async (id: string) => {
   try {
     if (!ObjectId.isValid(id)) {
@@ -142,7 +147,7 @@ const deleteUserIntoDB = async (id: string) => {
   }
 };
 
-//delete user from database
+//user hard delete
 const deleteUserFromDB = async (id: string) => {
   try {
     if (!ObjectId.isValid(id)) {
@@ -161,6 +166,7 @@ const deleteUserFromDB = async (id: string) => {
   }
 };
 
+//update user status
 const updateUserStatusIntoDB = async (id: string, userStatus: UserStatus) => {
   console.log(userStatus);
   try {
@@ -193,6 +199,7 @@ const updateUserStatusIntoDB = async (id: string, userStatus: UserStatus) => {
   }
 };
 
+//update user role
 const updateUserRoleIntoDB = async (id: string, role: UserRole) => {
   try {
     if (!ObjectId.isValid(id)) {
