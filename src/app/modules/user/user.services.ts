@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 const createUserIntoDB = async (userData: IUser) => {
   try {
     const {
-      userName,
+      fullName,
       password,
       phone,
       email,
@@ -40,7 +40,7 @@ const createUserIntoDB = async (userData: IUser) => {
     // Create a new user in the database
     const newUser = await prisma.user.create({
       data: {
-        userName,
+        fullName,
         password: hashedPassword,
         phone,
         email,

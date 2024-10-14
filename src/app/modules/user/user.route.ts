@@ -4,12 +4,7 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
-//public routes
-router.post(
-  "/register",
-  // validateRequest(userValidation.userValidationSchema),
-  UserControllers.createdUser
-);
+router.post("/register", UserControllers.createdUser);
 router.get("/", auth("ADMIN"), UserControllers.getUsers);
 router.get("/:id", UserControllers.getSingleUser);
 router.patch("/update/:id", auth(), UserControllers.updatedUser);

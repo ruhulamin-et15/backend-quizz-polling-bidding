@@ -9,38 +9,38 @@ generator client {
 
 model User {
   id                 String              @id @default(auto()) @map("_id") @db.ObjectId
-  email              String              @unique
-  userName           String
   phone              String              @unique
+  email              String              @unique
+  fullName           String
   password           String
-  classDepartment    String?
-  educationLevel     String
-  institution        String?
   studentId          Int
+  classDepartment    String?
+  educationLevel     String?
+  institution        String?
   hobbies            String?
   avatar             String?
-  participated       QuizParticipation[]  // Array of quiz participation objects
   presentAddress     String?
   permanentAddress   String?
   role               UserRole             @default(USER)
   userStatus         UserStatus           @default(ACTIVE)
   isVerified         Boolean              @default(false)
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
   otp                String?
   otpExpiresAt       DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  participated       QuizParticipation[]
 
   @@map("users")
 }
 
 model QuizParticipation {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  quizId         String   // ID of the quiz participated
-  quizName       String   // Name of the quiz
-  score          Int      // Score obtained in the quiz
-  participatedAt DateTime @default(now()) // Date and time of participation
+  quizId         String
+  quizName       String
+  score          Int
+  participatedAt DateTime @default(now())
   userId         String   @db.ObjectId
-  user           User     @relation(fields: [userId], references: [id])  // Relation back to the user
+  user           User     @relation(fields: [userId], references: [id])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
