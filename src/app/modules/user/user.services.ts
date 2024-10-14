@@ -8,52 +8,28 @@ const prisma = new PrismaClient();
 
 //create user
 const createUserIntoDB = async (userData: IUser) => {
-  try {
-    const {
-      fullName,
-      password,
-      phone,
-      email,
-      classDepartment,
-      educationLevel,
-      institution,
-      studentId,
-      hobbies,
-      avatar,
-      presentAddress,
-      permanentAddress,
-      role = "USER",
-      userStatus = "ACTIVE",
-    } = userData;
+  const { password } = userData;
 
+  try {
     const existingUser = await prisma.user.findFirst({
       where: {
-        OR: [{ email: email ?? undefined }, { phone: phone ?? undefined }],
+        OR: [
+          { email: userData.email ?? undefined },
+          { phone: userData.phone ?? undefined },
+        ],
       },
     });
 
+    if (existingUser) {
+      throw new ApiError(409, "User with this email/phone already exists!");
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (existingUser) {
-      throw new ApiError(409, "user with this email/phone already exist!");
-    }
-    // Create a new user in the database
     const newUser = await prisma.user.create({
       data: {
-        fullName,
+        ...userData,
         password: hashedPassword,
-        phone,
-        email,
-        classDepartment,
-        educationLevel: educationLevel ?? "not specified",
-        institution,
-        studentId: studentId ?? 0,
-        hobbies,
-        avatar,
-        presentAddress,
-        permanentAddress,
-        role,
-        userStatus,
       },
     });
 
