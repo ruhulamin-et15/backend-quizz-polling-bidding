@@ -3,6 +3,10 @@ import { IUser } from "./user.interface";
 import ApiError from "../../errors/ApiErrors";
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
+import { authReusable } from "../auth/auth.reusable";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
+import config from "../../../config";
+import { transporter } from "../../../helpers/transporter";
 
 const prisma = new PrismaClient();
 
@@ -36,6 +40,44 @@ const createUserIntoDB = async (userData: IUser) => {
     return newUser;
   } catch (error) {
     throw error;
+  }
+};
+
+//send otp by email
+const sendOtpByEmailIntoDB = async (email: string) => {
+  await authReusable.existUser(email);
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpExpiresAt = new Date();
+  otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 5);
+  const otpExpiresAtString = otpExpiresAt.toISOString();
+
+  await prisma.user.update({
+    where: { email },
+    data: { otp, otpExpiresAt: otpExpiresAtString },
+  });
+
+  const emailTransport = transporter;
+
+  // Email options
+  const mailOptions = {
+    from: `"BD Quizz-Polling" <${config.emailSender.email}>`,
+    to: email,
+    subject: "User Verification",
+    html: `
+      <p>Hello,</p>
+      <p>Verify user using this OTP: ${otp}, This OTP is Expired in 5 minutes,</p>
+      <p>If you didn't request this, please ignore this email.</p>
+    `,
+  };
+
+  // Send the email
+  try {
+    const info = await emailTransport.sendMail(mailOptions);
+    console.log("Email sent: " + info.response);
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw new Error("Failed to send password reset email.");
   }
 };
 
@@ -206,6 +248,7 @@ const updateUserRoleIntoDB = async (id: string, role: UserRole) => {
 
 export const userService = {
   createUserIntoDB,
+  sendOtpByEmailIntoDB,
   getUsersIntoDB,
   getSingleUserIntoDB,
   updateUserIntoDB,

@@ -34,7 +34,7 @@ const loginUserIntoDB = async (userData: TuserData) => {
 
     const payload = {
       id: user.id,
-      userName: user.userName,
+      fullName: user.fullName,
       email: user.email,
       role: user.role,
     };
@@ -83,7 +83,7 @@ const forgetPasswordIntoDB = async (email: string) => {
   const user = await authReusable.existUser(email);
   const payload = {
     id: user.id,
-    userName: user.userName,
+    fullName: user.fullName,
     email: user.email,
     role: user.role,
   };

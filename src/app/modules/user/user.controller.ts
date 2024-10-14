@@ -13,6 +13,19 @@ const createdUser = catchAsync(async (req, res) => {
   });
 });
 
+//send otp by email for user verification
+
+const sendOtpByEmail = catchAsync(async (req: any, res) => {
+  const userEmail = req.user.email;
+  await userService.sendOtpByEmailIntoDB(userEmail);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "OTP sent successfully",
+  });
+});
+
 //get users
 const getUsers = catchAsync(async (req, res) => {
   const users = await userService.getUsersIntoDB();
@@ -93,6 +106,7 @@ const updatedUserRole = catchAsync(async (req, res) => {
 
 export const UserControllers = {
   createdUser,
+  sendOtpByEmail,
   getUsers,
   getSingleUser,
   updatedUser,
