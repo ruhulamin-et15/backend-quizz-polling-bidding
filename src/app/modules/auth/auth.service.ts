@@ -7,8 +7,6 @@ import { authReusable } from "./auth.reusable";
 import { IVerifyData } from "./auth.interface";
 import prisma from "../../../shared/prisma";
 
-// const client = twilio(config.otp.account_ssid, config.otp.auth_token);
-
 interface TuserData {
   email: string;
   password: string;
@@ -78,32 +76,19 @@ const changePasswordIntoDB = async (userData: TuserData) => {
   });
 };
 
-//send token/otp using email
+//send otp for forget passoword
 const forgetPasswordIntoDB = async (email: string) => {
-  const user = await authReusable.existUser(email);
-  const payload = {
-    id: user.id,
-    fullName: user.fullName,
-    email: user.email,
-    role: user.role,
-  };
+  await authReusable.existUser(email);
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const otpExpiresAt = new Date();
   otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 5);
-  const otpExpiresAtString = otpExpiresAt.toISOString(); // Convert to string
+  const otpExpiresAtString = otpExpiresAt.toISOString();
 
   await prisma.user.update({
     where: { email },
-    data: { otp, otpExpiresAt: otpExpiresAtString }, // Assign the string value
+    data: { otp, otpExpiresAt: otpExpiresAtString },
   });
-
-  //generate token
-  const resetToken = jwtHelpers.generateToken(
-    payload,
-    config.jwt.reset_pass_secret,
-    config.jwt.reset_pass_token_expires_in
-  );
 
   const emailTransport = transporter;
 
@@ -114,20 +99,15 @@ const forgetPasswordIntoDB = async (email: string) => {
     subject: "Password Reset Request",
     html: `
       <p>Hello,</p>
-      <p>Verify using this OTP: ${otp}, This OTP is Expired in 5 minutes,</p>
-      <p>Or</p>
-      <p>You requested a password reset. Please click the link below to reset your password:</p>
-      <a href="http://localhost:3000/reset-password?token=${resetToken}">Reset Password</a>
+      <p>reset password using this OTP: ${otp}, This OTP is Expired in 5 minutes,</p>
       <p>If you didn't request this, please ignore this email.</p>
     `,
   };
 
   // Send the email
   try {
-    const info = await emailTransport.sendMail(mailOptions);
-    console.log("Email sent: " + info.response);
+    await emailTransport.sendMail(mailOptions);
   } catch (error) {
-    console.error("Error sending email:", error);
     throw new Error("Failed to send password reset email.");
   }
 };
@@ -159,25 +139,10 @@ const resetPasswordUsingOTPVerify = async (verifyData: IVerifyData) => {
     where: { id: user.id },
     data: {
       password: hashedPassword,
-      otp: null,
-      otpExpiresAt: null,
     },
   });
 
   return user;
-};
-
-//reset password using token
-const resetPasswordUsingTokenVerify = async (userData: {
-  email: string;
-  newPassword: string;
-}) => {
-  const hashedPassword = await bcrypt.hash(userData.newPassword, 10);
-  await prisma.user.updateMany({
-    data: {
-      password: hashedPassword,
-    },
-  });
 };
 
 export const authService = {
@@ -185,5 +150,4 @@ export const authService = {
   changePasswordIntoDB,
   forgetPasswordIntoDB,
   resetPasswordUsingOTPVerify,
-  resetPasswordUsingTokenVerify,
 };
