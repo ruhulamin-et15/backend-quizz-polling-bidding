@@ -36,17 +36,6 @@ const forgetPassword = catchAsync(async (req, res) => {
   });
 });
 
-//send otp for forget password
-// const sendOtpUsingPhone = catchAsync(async (req, res) => {
-//   const otp = await authService.sendOtpUsingPhoneIntoDB(req.body.phone);
-
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: `OTP send your phone and otp is ${otp}`,
-//   });
-// });
-
 //reset password using otp varificaton
 const resetPasswordUsingOTP = catchAsync(async (req, res) => {
   await authService.resetPasswordUsingOTPVerify(req.body);
@@ -57,30 +46,9 @@ const resetPasswordUsingOTP = catchAsync(async (req, res) => {
   });
 });
 
-//reset password using send token
-const resetPasswordUsingToken = catchAsync(async (req, res) => {
-  const token = req.headers.authorization as string;
-  const verifyToken = jwtHelpers.verifyToken(
-    token,
-    config.jwt.reset_pass_secret
-  );
-  if (!verifyToken) {
-    throw new ApiError(404, "Your forget password link has expired");
-  }
-
-  await authService.resetPasswordUsingTokenVerify(req.body);
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Password reset successfully",
-  });
-});
-
 export const authController = {
   loginUser,
   changePassword,
   forgetPassword,
-  resetPasswordUsingOTP,
-  resetPasswordUsingToken,
+  resetPasswordUsingOTP
 };
