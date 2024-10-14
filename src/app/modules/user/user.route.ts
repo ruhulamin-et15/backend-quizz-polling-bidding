@@ -5,11 +5,19 @@ import auth from "../../middlewares/auth";
 const router = express.Router();
 
 router.post("/register", UserControllers.createdUser);
+
 router.post(
   "/send-otp",
   auth("USER", "ADMIN", "TEACHER"),
   UserControllers.sendOtpByEmail
 );
+
+router.patch(
+  "/verify-user",
+  auth("ADMIN", "USER", "TEACHER"),
+  UserControllers.verifyUser
+);
+
 router.get("/", auth("ADMIN"), UserControllers.getUsers);
 router.get("/:id", UserControllers.getSingleUser);
 router.patch("/update/:id", auth(), UserControllers.updatedUser);

@@ -132,40 +132,6 @@ const forgetPasswordIntoDB = async (email: string) => {
   }
 };
 
-//send otp using phone number
-// const sendOtpUsingPhoneIntoDB = async (phone: string) => {
-//   const user = await prisma.user.findUnique({
-//     where: { phone: phone },
-//   });
-
-//   if (!user) {
-//     throw new ApiError(
-//       404,
-//       `user not registered with ${phone}, please register first`
-//     );
-//   }
-
-//   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-//   const otpExpiresAt = new Date();
-//   otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
-
-//   await prisma.user.update({
-//     where: { phone },
-//     data: { otp, otpExpiresAt },
-//   });
-
-//   // Send OTP via SMS using Twilio
-//   await client.messages.create({
-//     body: `Your password reset code is ${otp},
-//     thanks,
-//     BD Quezz & Polling`,
-//     from: config.otp.twilioNumber,
-//     to: phone,
-//   });
-
-//   return otp;
-// };
-
 //verify otp and reset password
 const resetPasswordUsingOTPVerify = async (verifyData: IVerifyData) => {
   const { email, otp, newPassword } = verifyData;

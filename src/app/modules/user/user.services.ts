@@ -43,7 +43,7 @@ const createUserIntoDB = async (userData: IUser) => {
   }
 };
 
-//send otp by email
+//send otp for user verification
 const sendOtpByEmailIntoDB = async (email: string) => {
   await authReusable.existUser(email);
 
@@ -79,6 +79,42 @@ const sendOtpByEmailIntoDB = async (email: string) => {
     console.error("Error sending email:", error);
     throw new Error("Failed to send password reset email.");
   }
+};
+
+//verify user by otp
+const verifyUserByOtpIntoDB = async (email: string, verifyData: any) => {
+  const { otp } = verifyData;
+
+  const user = await prisma.user.findFirst({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(404, "User not found for verification!");
+  }
+
+  if (user.isVerified) {
+    throw new ApiError(409, "User already verified!");
+  }
+
+  const currentTime = new Date(Date.now());
+
+  if (user?.otp !== otp) {
+    throw new ApiError(404, "Your OTP is incorrect!");
+  } else if (!user.otpExpiresAt || user.otpExpiresAt <= currentTime) {
+    throw new ApiError(409, "Your OTP is expired, please send new otp");
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      isVerified: true,
+    },
+  });
+
+  return user;
 };
 
 //get all users
@@ -249,6 +285,7 @@ const updateUserRoleIntoDB = async (id: string, role: UserRole) => {
 export const userService = {
   createUserIntoDB,
   sendOtpByEmailIntoDB,
+  verifyUserByOtpIntoDB,
   getUsersIntoDB,
   getSingleUserIntoDB,
   updateUserIntoDB,
