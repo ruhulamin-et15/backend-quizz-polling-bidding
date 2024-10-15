@@ -8,41 +8,75 @@ generator client {
 }
 
 model User {
-  id                 String              @id @default(auto()) @map("_id") @db.ObjectId
-  phone              String              @unique
-  email              String              @unique
-  fullName           String
-  password           String
-  studentId          Int                 @default(0)
-  classDepartment    String?
-  educationLevel     String?
-  institution        String?
-  hobbies            String?
-  avatar             String?
-  presentAddress     String?
-  permanentAddress   String?
-  role               UserRole             @default(USER)
-  userStatus         UserStatus           @default(ACTIVE)
-  isVerified         Boolean              @default(false)
-  otp                String?
-  otpExpiresAt       DateTime?
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  participated       QuizParticipation[]
+  id               String              @id @default(auto()) @map("_id") @db.ObjectId
+  phone            String              @unique
+  email            String              @unique
+  fullName         String
+  password         String
+  studentId        Int                 @default(0)
+  classDepartment  String?
+  educationLevel   String?
+  institution      String?
+  hobbies          String?
+  avatar           String?
+  presentAddress   String?
+  permanentAddress String?
+  role             UserRole            @default(USER)
+  userStatus       UserStatus          @default(ACTIVE)
+  isVerified       Boolean             @default(false)
+  otp              String?
+  otpExpiresAt     DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  quizzes          Quiz[]
+  participations   QuizParticipation[]
+  Questions        Questions[]
 
   @@map("users")
 }
 
+model Quiz {
+  id             String              @id @default(auto()) @map("_id") @db.ObjectId
+  teacherId      String              @db.ObjectId
+  title          String
+  description    String
+  duration       Int
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  teacher        User                @relation(fields: [teacherId], references: [id])
+  questions      Questions[]
+  participations QuizParticipation[]
+
+  @@map("quizzes")
+}
+
+model Questions {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  quizId        String   @db.ObjectId
+  teacherId     String   @db.ObjectId
+  question      String
+  options       String[]
+  correctAnswer String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  quiz          Quiz     @relation(fields: [quizId], references: [id])
+  teacher       User     @relation(fields: [teacherId], references: [id])
+
+  @@map("questions")
+}
+
 model QuizParticipation {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  quizId         String
-  quizName       String
+  userId         String   @db.ObjectId
+  quizId         String   @db.ObjectId
   score          Int
   participatedAt DateTime @default(now())
-  userId         String   @db.ObjectId
-  user           User     @relation(fields: [userId], references: [id])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
+  quiz           Quiz     @relation(fields: [quizId], references: [id])
+
+  @@map("quiz_participations")
 }
 
 enum UserStatus {
