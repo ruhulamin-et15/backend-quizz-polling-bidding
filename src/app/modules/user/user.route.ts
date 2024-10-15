@@ -19,6 +19,7 @@ router.patch(
 );
 
 router.get("/", auth("ADMIN"), UserControllers.getUsers);
+
 router.get("/:id", UserControllers.getSingleUser);
 router.patch("/update/:id", auth(), UserControllers.updatedUser);
 router.patch("/delete/:id", auth(), UserControllers.deletedUser);

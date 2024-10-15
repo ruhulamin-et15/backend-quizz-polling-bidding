@@ -32,7 +32,7 @@ const forgetPassword = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: `forget password link send to ${req.body.email}`,
+    message: `forget password OTP send to ${req.body.email}`,
   });
 });
 
@@ -50,5 +50,5 @@ export const authController = {
   loginUser,
   changePassword,
   forgetPassword,
-  resetPasswordUsingOTP
+  resetPasswordUsingOTP,
 };
