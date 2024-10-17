@@ -10,6 +10,7 @@ router.get("/", auth(), questionControllers.getQuestions);
 
 router.get("/:questionId", auth(), questionControllers.getSingleQuestion);
 
+//update question from DB
 router.patch(
   "/:questionId",
   auth("TEACHER", "ADMIN"),
