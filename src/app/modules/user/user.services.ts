@@ -142,6 +142,9 @@ const getSingleUserIntoDB = async (id: string) => {
       where: {
         id: id,
       },
+      include: {
+        participations: true,
+      },
     });
     if (!user) {
       throw new ApiError(404, "user not found!");

@@ -14,4 +14,11 @@ router.patch("/:quizId", auth("ADMIN", "TEACHER"), quizControllers.updateQuiz);
 
 router.delete("/:quizId", auth("ADMIN", "TEACHER"), quizControllers.deleteQuiz);
 
+//quiz submit
+router.post(
+  "/submit-quiz/:quizId",
+  auth("ADMIN", "USER", "TEACHER"),
+  quizControllers.submitNewQuiz
+);
+
 export const quizRoutes = router;

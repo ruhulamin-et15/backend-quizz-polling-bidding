@@ -57,10 +57,23 @@ const deleteQuiz = catchAsync(async (req: any, res: any) => {
   });
 });
 
+//submit new quiz
+const submitNewQuiz = catchAsync(async (req: any, res: any) => {
+  const result = await quizServices.submitQuizIntoDB(req);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "New quiz submitted successfully",
+    data: result,
+  });
+});
+
 export const quizControllers = {
   createQuiz,
   getAllQuizzes,
   getQuizById,
   updateQuiz,
   deleteQuiz,
+  submitNewQuiz,
 };

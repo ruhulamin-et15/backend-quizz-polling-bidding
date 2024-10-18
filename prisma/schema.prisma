@@ -57,6 +57,7 @@ model Questions {
   question      String
   options       String[]
   correctAnswer String
+  marks         Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   quiz          Quiz     @relation(fields: [quizId], references: [id])
@@ -66,15 +67,15 @@ model Questions {
 }
 
 model QuizParticipation {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String   @db.ObjectId
-  quizId         String   @db.ObjectId
-  score          Int
-  participatedAt DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id])
-  quiz           Quiz     @relation(fields: [quizId], references: [id])
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  quizId      String   @db.ObjectId
+  score       Int
+  submittedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
 
   @@map("quiz_participations")
 }

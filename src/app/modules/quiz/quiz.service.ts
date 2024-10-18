@@ -77,10 +77,58 @@ const deleteQuizIntoDB = async (req: any) => {
   return;
 };
 
+const submitQuizIntoDB = async (req: any) => {
+  const quizId = req.params.quizId;
+  const userId = req.user.id;
+  const { answers } = req.body;
+
+  if (!Array.isArray(answers)) {
+    throw new ApiError(400, "Answers must be an array");
+  }
+
+  const quiz = await prisma.quiz.findUnique({
+    where: { id: quizId },
+    include: {
+      questions: true,
+    },
+  });
+  if (!quiz) {
+    throw new ApiError(404, "Quiz not found");
+  }
+
+  const alreadySubmitQuiz = await prisma.quizParticipation.findFirst({
+    where: { quizId: quizId, userId: userId },
+  });
+
+  if (alreadySubmitQuiz) {
+    throw new ApiError(409, "User has already submitted this quiz");
+  }
+
+  let score = 0;
+  for (const answer of answers) {
+    const question = quiz.questions.find((q) => q.id === answer.questionId);
+    if (question && question.correctAnswer === answer.selectedOption) {
+      score += question.marks;
+    }
+  }
+
+  const participation = await prisma.quizParticipation.create({
+    data: {
+      userId,
+      quizId,
+      score,
+      submittedAt: new Date(),
+    },
+  });
+
+  return participation;
+};
+
 export const quizServices = {
   createQuizIntoDB,
   getAllQuizzesFromDB,
   getQuizByIdFromDB,
   updateQuizIntoDB,
   deleteQuizIntoDB,
+  submitQuizIntoDB,
 };
