@@ -30,9 +30,22 @@ model User {
   updatedAt        DateTime            @updatedAt
   quizzes          Quiz[]
   participations   QuizParticipation[]
-  Questions        Questions[]
+  questions        Questions[]
+  polls            Polls[]
 
   @@map("users")
+}
+
+model Polls {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  question  String
+  options   String
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("polls")
 }
 
 model Quiz {

@@ -1,10 +1,15 @@
 import express from "express";
 import { UserControllers } from "./user.controller";
 import auth from "../../middlewares/auth";
+import { userValidation } from "./user.validation";
 
 const router = express.Router();
 
-router.post("/register", UserControllers.createdUser);
+router.post(
+  "/register",
+  userValidation.userValidationMiddleware,
+  UserControllers.createdUser
+);
 
 router.post(
   "/send-otp",
