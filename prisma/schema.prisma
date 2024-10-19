@@ -32,20 +32,44 @@ model User {
   participations   QuizParticipation[]
   questions        Questions[]
   polls            Polls[]
+  Votes            Votes[]
 
   @@map("users")
 }
 
 model Polls {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  adminId   String   @db.ObjectId
   question  String
-  options   String
-  userId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  admin     User     @relation(fields: [adminId], references: [id])
+  options   Option[]
 
   @@map("polls")
+}
+
+model Option {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  pollId    String   @db.ObjectId
+  option    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  poll      Polls?   @relation(fields: [pollId], references: [id])
+  votes     Votes[]
+
+  @@map("options")
+}
+
+model Votes {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  optionId  String   @unique @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  createdAt DateTime @default(now())
+  otion     Option   @relation(fields: [optionId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("votes")
 }
 
 model Quiz {
