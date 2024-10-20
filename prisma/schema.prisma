@@ -32,9 +32,33 @@ model User {
   participations   QuizParticipation[]
   questions        Questions[]
   polls            Polls[]
-  Votes            Votes[]
+  votes            Votes[]
+  bidding          Bidding[]
+  artwork          Artwork[]
 
   @@map("users")
+}
+
+model Artwork {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  imageUrl    String
+  artistId    String    @db.ObjectId
+  artist      User?     @relation(fields: [artistId], references: [id])
+  biddings    Bidding[]
+
+  @@map("artworks")
+}
+
+model Bidding {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  artworkId String  @db.ObjectId
+  artwork   Artwork @relation(fields: [artworkId], references: [id])
+  userId    String  @db.ObjectId
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@map("biddings")
 }
 
 model Polls {
@@ -127,4 +151,5 @@ enum UserRole {
   ADMIN
   USER
   TEACHER
+  ARTIST
 }

@@ -6,6 +6,7 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
+  backend_base_url: process.env.BACKEND_BASE_URL,
   jwt: {
     jwt_secret: process.env.JWT_SECRET as string,
     expires_in: process.env.EXPIRES_IN as string,
@@ -20,15 +21,6 @@ export default {
     email: process.env.NODE_MAILER_EMAIL,
     app_pass: process.env.NODE_MAILER_APP_PASS,
   },
-  //   ssl: {
-  //     storeId: process.env.STORE_ID,
-  //     storePass: process.env.STORE_PASS,
-  //     successUrl: process.env.SUCCESS_URL,
-  //     cancelUrl: process.env.CANCEL_URL,
-  //     failUrl: process.env.FAIL_URL,
-  //     sslPaymentApi: process.env.SSL_PAYMENT_API,
-  //     sslValidationApi: process.env.SSL_VALIDATIOIN_API,
-  //   },
 
   otp: {
     account_ssid: process.env.ACCOUNT_SSID,

@@ -1,13 +1,26 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 
 import httpStatus from "http-status";
+import path from "path";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import router from "./app/routes";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
 import { PrismaClient } from "@prisma/client";
 
 const app: Application = express();
 const prisma = new PrismaClient();
+
+export const corsOptions = {
+  origin: [
+    "http://localhost:3001",
+    "http://localhost:3000",
+    "https://rydleap-dashboard.vercel.app",
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
 // Middleware setup
 prisma
@@ -19,19 +32,24 @@ prisma
     console.error("Failed to connect to the database:", error);
   });
 
-app.use(cors());
+// Middleware setup
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+// Serve static files from the uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 // Route handler for root endpoint
 app.get("/", (req: Request, res: Response) => {
   res.send({
-    Message: "Welcome to api main route",
+    Message: "Polling-Quiz-Bidding Server is running",
   });
 });
 
 // Router setup
-app.use("/api/v1", router); // Assuming router handles '/api/v1' routes
+app.use("/api/v1", router);
 
 // Global Error Handler
 app.use(GlobalErrorHandler);

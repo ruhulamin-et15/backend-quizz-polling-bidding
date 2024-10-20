@@ -4,6 +4,7 @@ import { authRoutes } from "../modules/auth/auth.route";
 import { quizRoutes } from "../modules/quiz/quiz.route";
 import { questionRoutes } from "../modules/question/question.route";
 import { pollingRoutes } from "../modules/polling/polling.route";
+import { artworkRouters } from "../modules/artwork/artwork.routes";
 
 const router = express.Router();
 
@@ -31,6 +32,11 @@ const moduleRoutes = [
   {
     path: "/poll",
     route: pollingRoutes,
+  },
+
+  {
+    path: "/artwork",
+    route: artworkRouters,
   },
 ];
 
