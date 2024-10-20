@@ -12,4 +12,27 @@ router.post(
   artworkController.createArtwork
 );
 
+router.get("/", auth(), artworkController.getArtworks);
+
+router.get("/:artworkId", auth(), artworkController.getSingleArtwork);
+
+router.patch(
+  "/:artworkId",
+  auth("ADMIN", "ARTIST"),
+  artworkController.updateArtwork
+);
+
+router.delete(
+  "/:artworkId",
+  auth("ADMIN", "ARTIST"),
+  artworkController.deleteArtwork
+);
+
+router.patch(
+  "/update-imgurl/:artworkId",
+  auth("ADMIN", "ARTIST"),
+  fileUploader.uploadArtworkImage,
+  artworkController.updateArtworkImage
+);
+
 export const artworkRouters = router;
