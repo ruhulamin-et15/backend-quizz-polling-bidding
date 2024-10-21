@@ -5,6 +5,7 @@ import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import { generateImageUrl } from "../../../helpers/generateUrl";
 
+//create artwork
 const createArtworkIntoDB = async (req: any) => {
   const artistId = req.user.id;
   const files = req.file;
@@ -27,6 +28,7 @@ const createArtworkIntoDB = async (req: any) => {
   return artwork;
 };
 
+//get all artworks
 const getArtworksFromDB = async () => {
   const artworks = await prisma.artwork.findMany({
     include: {
@@ -49,6 +51,7 @@ const getArtworksFromDB = async () => {
   return sanitizedArtworks;
 };
 
+//get artwork by artist id
 const getSingleArtworkFromDB = async (artworkId: string) => {
   const artwork: any = await prisma.artwork.findUnique({
     where: { id: artworkId },
@@ -67,6 +70,7 @@ const getSingleArtworkFromDB = async (artworkId: string) => {
   };
 };
 
+//update artwork by artist
 const updateArtworkIntoDB = async (req: any) => {
   const updatedArtworkData = req.body;
   const artwork = await getSingleArtworkFromDB(req.params.artworkId);
@@ -80,6 +84,7 @@ const updateArtworkIntoDB = async (req: any) => {
   return updatedArtwork;
 };
 
+//delete artwork by artist and remove associated image file if exists
 const deleteArtworkIntoDB = async (req: any) => {
   const artwork = await getSingleArtworkFromDB(req.params.artworkId);
   if (!artwork) {
@@ -106,6 +111,7 @@ const deleteArtworkIntoDB = async (req: any) => {
   return;
 };
 
+//update artwork image by artistId
 const updateArtworkImage = async (req: any) => {
   const files = req.file;
 
