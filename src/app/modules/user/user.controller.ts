@@ -73,6 +73,18 @@ const updatedUser = catchAsync(async (req, res) => {
   });
 });
 
+//update user avatar
+const updatedUserAvatar = catchAsync(async (req, res) => {
+  const updateUser = await userService.updateUserAvatar(req);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "user avatar updated successfully",
+    data: updateUser,
+  });
+});
+
 //user soft delete
 const deletedUser = catchAsync(async (req, res) => {
   await userService.deleteUserIntoDB(req.params.id);
@@ -126,4 +138,5 @@ export const UserControllers = {
   deletedUserFromDatabase,
   updatedUserStatus,
   updatedUserRole,
+  updatedUserAvatar,
 };

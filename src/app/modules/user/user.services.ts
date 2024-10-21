@@ -4,9 +4,10 @@ import ApiError from "../../errors/ApiErrors";
 import bcrypt from "bcryptjs";
 import { ObjectId } from "mongodb";
 import { authReusable } from "../auth/auth.reusable";
-import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import config from "../../../config";
 import { transporter } from "../../../helpers/transporter";
+import { generateImageUrl } from "../../../helpers/generateUrl";
+import path from "path";
 
 const prisma = new PrismaClient();
 
@@ -182,6 +183,32 @@ const updateUserIntoDB = async (id: string, userData: IUser) => {
   }
 };
 
+//update user avatar
+const updateUserAvatar = async (req: any) => {
+  const files = req.file;
+
+  if (!files) {
+    throw new ApiError(400, "No file uploaded");
+  }
+
+  const avatar = generateImageUrl(files);
+  const user = await getSingleUserIntoDB(req.params.userId);
+
+  if (user.avatar) {
+    //avatar set to ""
+    path.join(
+      process.cwd(),
+      user.avatar.replace(`${config.backend_base_url}`, "")
+    );
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: req.params.userId },
+    data: { avatar: avatar },
+  });
+  return updatedUser.avatar;
+};
+
 //user soft delete
 const deleteUserIntoDB = async (id: string) => {
   try {
@@ -292,6 +319,7 @@ export const userService = {
   getUsersIntoDB,
   getSingleUserIntoDB,
   updateUserIntoDB,
+  updateUserAvatar,
   deleteUserIntoDB,
   deleteUserFromDB,
   updateUserStatusIntoDB,

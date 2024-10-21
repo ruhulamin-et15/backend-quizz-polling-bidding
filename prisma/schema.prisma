@@ -18,7 +18,7 @@ model User {
   educationLevel   String?
   institution      String?
   hobbies          String?
-  avatar           String?
+  avatar           String              @default("http://localhost:5000/avatar.jpg")
   presentAddress   String?
   permanentAddress String?
   role             UserRole            @default(USER)

@@ -120,17 +120,10 @@ const updateArtworkImage = async (req: any) => {
   const newImageUrl = generateImageUrl(files);
 
   if (artwork.imageUrl) {
-    const imagePath = path.join(
+    path.join(
       process.cwd(),
       artwork.imageUrl.replace(`${config.backend_base_url}`, "")
     );
-
-    fs.unlink(imagePath, (err: any) => {
-      if (err) {
-        console.error("Error deleting image file:", err);
-        throw new ApiError(500, "Failed to delete image file");
-      }
-    });
   }
 
   const updatedArtwork = await prisma.artwork.update({
